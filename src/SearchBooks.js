@@ -15,7 +15,7 @@ class SearchBooks extends Component {
 
   constructor() {
     super()
-    this.searchBooks = debounce(this.searchBooks, 1000)
+    this.searchBooks = debounce(this.searchBooks, 500)
   }
 
   searchBooks(query) {
@@ -35,6 +35,17 @@ class SearchBooks extends Component {
     if (query.length > 0) {
       this.searchBooks(query)
     }
+  }
+
+  onChangeShelf(book) {
+    this.setState((state) => ({
+      books: state.books.map(function(b) {
+        if (b.id === book.id) {
+          b = book;
+        }
+        return b;
+      })
+    }))
   }
 
   render() {
@@ -58,7 +69,10 @@ class SearchBooks extends Component {
             <ol className="books-grid">
               {books.map((book) => (
                 <li key={book.id}>
-                  <BookItem book={book} />
+                  <BookItem
+                    book={book}
+                    onChangeShelf={this.onChangeShelf.bind(this)}
+                  />
                 </li>
               ))}
             </ol>
