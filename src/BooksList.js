@@ -14,6 +14,17 @@ class BooksList extends React.Component {
     })
   }
 
+  onChangeShelf(book) {
+    this.setState((state) => ({
+      books: state.books.map(function(b) {
+        if (b.id === book.id) {
+          b.shelf = book.shelf;
+        }
+        return b;
+      })
+    }))
+  }
+
   render() {
     const books = this.state.books
     const bookShelfs = [
@@ -39,7 +50,11 @@ class BooksList extends React.Component {
         <div className="list-books-content">
           <div>
             {bookShelfs.map((shelf,i) => (
-              <BooksShelf key={shelf.title + '-' + i} books={shelf.books} title={shelf.title} />
+              <BooksShelf key={shelf.title + '-' + i}
+                books={shelf.books}
+                title={shelf.title}
+                onChangeShelf={this.onChangeShelf.bind(this)}
+                />
             ))}
           </div>
         </div>
