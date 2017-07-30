@@ -5,13 +5,19 @@ import BooksShelf from './BooksShelf';
 
 class BooksList extends React.Component {
   state = {
+    isLoading: false,
     books: []
   };
 
   componentDidMount() {
-    BooksAPI.getAll().then(books => {
-      this.setState({ books });
-    });
+    this.setState({ isLoading: true });
+    BooksAPI.getAll()
+      .then(books => {
+        this.setState({ books, isLoading: false });
+      })
+      .catch(() => {
+        this.setState({ isLoading: false });
+      });
   }
 
   onChangeShelf(book) {
@@ -48,16 +54,16 @@ class BooksList extends React.Component {
           <h1>MyReads</h1>
         </div>
         <div className="list-books-content">
-          <div>
-            {bookShelfs.map((shelf, i) =>
-              <BooksShelf
-                key={shelf.title + '-' + i}
-                books={shelf.books}
-                title={shelf.title}
-                onChangeShelf={this.onChangeShelf.bind(this)}
-              />
-            )}
-          </div>
+          {this.state.isLoading
+            ? <h2>Loading...</h2>
+            : bookShelfs.map((shelf, i) =>
+                <BooksShelf
+                  key={shelf.title + '-' + i}
+                  books={shelf.books}
+                  title={shelf.title}
+                  onChangeShelf={this.onChangeShelf.bind(this)}
+                />
+              )}
         </div>
         <div className="open-search">
           <Link to="/search">Add a book</Link>
