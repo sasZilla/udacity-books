@@ -1,6 +1,6 @@
-# Books App
+# A Book Tracking App
 
-Books App to store and find books
+A Book Tracking App to store and find books
 
 ## Getting Started
 ### Clone repository
