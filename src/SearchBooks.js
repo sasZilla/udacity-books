@@ -10,23 +10,34 @@ class SearchBooks extends Component {
   state = {
     isLoading: false,
     query: '',
-    books: []
+    books: [],
+    errorMessage: ''
   };
 
   constructor() {
     super();
-    this.searchBooks = debounce(this.searchBooks, 500);
+    this.searchBooks = debounce(this.searchBooks, 1000);
   }
 
   searchBooks(query) {
     const queryStr = query.trim();
-    this.setState({ isLoading: true });
+    this.setState({
+      isLoading: true,
+      errorMessage: ''
+    });
     BooksAPI.search(queryStr, SEARCH_LIMIT).then(books => {
-      this.setState({
-        books,
-        query: queryStr,
-        isLoading: false
-      });
+      if (books.error) {
+        this.setState({
+          errorMessage: books.error,
+          books: []
+        });
+      } else {
+        this.setState({
+          books,
+          query: queryStr
+        });
+      }
+      this.setState({ isLoading: false });
     });
   }
 
@@ -67,6 +78,11 @@ class SearchBooks extends Component {
           </div>
         </div>
         <div className="search-books-results">
+          {this.state.errorMessage &&
+            <div className="error-message">
+              {this.state.errorMessage}
+            </div>}
+
           {this.state.isLoading
             ? <h2>Loading...</h2>
             : <ol className="books-grid">
