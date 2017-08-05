@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import debounce from 'lodash/debounce';
+import find from 'lodash/find';
+import { Debounce } from 'react-throttle';
 import { Link } from 'react-router-dom';
 import * as BooksAPI from './BooksAPI';
 import BookItem from './BookItem';
@@ -11,22 +12,24 @@ class SearchBooks extends Component {
     isLoading: false,
     query: '',
     books: [],
+    booksOnShelfs: [],
     errorMessage: ''
   };
 
-  constructor() {
-    super();
-    // Throttling search results
-    // Waiting 1s before request backend
-    this.searchBooks = debounce(this.searchBooks, 1000);
+  componentDidMount() {
+    // Keep Shelfs to provide correct shelfs for books
+    BooksAPI.getAll().then(booksOnShelfs => {
+      this.setState({ booksOnShelfs });
+    });
   }
 
-  searchBooks(query) {
-    const queryStr = query.trim();
+  onSearchBooks = event => {
+    const queryStr = event.target.value.trim();
     this.setState({
       isLoading: true,
       errorMessage: ''
     });
+
     BooksAPI.search(queryStr, SEARCH_LIMIT).then(books => {
       if (books.error) {
         this.setState({
@@ -35,23 +38,21 @@ class SearchBooks extends Component {
         });
       } else {
         this.setState({
-          books,
+          books: books.map(book => {
+            const bookOnShelf = find(this.state.booksOnShelfs, { id: book.id });
+            if (bookOnShelf) {
+              book.shelf = bookOnShelf.shelf;
+            }
+            return book;
+          }),
           query: queryStr
         });
       }
       this.setState({ isLoading: false });
     });
-  }
+  };
 
-  updateQuery(event) {
-    let query = event.target.value;
-    this.setState({ query });
-    if (query.length > 0) {
-      this.searchBooks(query);
-    }
-  }
-
-  onChangeShelf(book) {
+  onChangeShelf = book => {
     this.setState(state => ({
       books: state.books.map(function(b) {
         if (b.id === book.id) {
@@ -60,7 +61,7 @@ class SearchBooks extends Component {
         return b;
       })
     }));
-  }
+  };
 
   render() {
     const books = this.state.books;
@@ -72,12 +73,13 @@ class SearchBooks extends Component {
             Close
           </Link>
           <div className="search-books-input-wrapper">
-            <input
-              type="text"
-              placeholder="Search by title or author"
-              value={this.state.query}
-              onChange={this.updateQuery.bind(this)}
-            />
+            <Debounce time="1000" handler="onChange">
+              <input
+                type="text"
+                placeholder="Search by title or author"
+                onChange={this.onSearchBooks}
+              />
+            </Debounce>
           </div>
         </div>
         <div className="search-books-results">
@@ -89,12 +91,9 @@ class SearchBooks extends Component {
           {this.state.isLoading
             ? <h2>Loading...</h2>
             : <ol className="books-grid">
-                {books.map(book =>
-                  <li key={book.id}>
-                    <BookItem
-                      book={book}
-                      onChangeShelf={this.onChangeShelf.bind(this)}
-                    />
+                {books.map((book, i) =>
+                  <li key={book.id + '_' + i}>
+                    <BookItem book={book} onChangeShelf={this.onChangeShelf} />
                   </li>
                 )}
               </ol>}
