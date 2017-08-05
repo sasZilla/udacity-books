@@ -7,7 +7,8 @@ class BookItem extends React.Component {
     shelf: this.props.book.shelf
   };
 
-  onSelect(shelf) {
+  onSelect(event) {
+    const shelf = event.target.value;
     this.setState({ shelf: shelf });
     this.props.book.shelf = shelf;
     BooksAPI.update(this.props.book, shelf).then(() => {
@@ -31,7 +32,7 @@ class BookItem extends React.Component {
           />
           <div className="book-shelf-changer">
             <select
-              onChange={event => this.onSelect(event.target.value)}
+              onChange={this.onSelect.bind(this)}
               value={this.state.shelf}
             >
               <option value="none" disabled>
@@ -47,9 +48,10 @@ class BookItem extends React.Component {
         <div className="book-title">
           {book.title}
         </div>
-        <div className="book-authors">
-          {book.authors.join(', ')}
-        </div>
+        {book.authors &&
+          <div className="book-authors">
+            {book.authors.join(', ')}
+          </div>}
       </div>
     );
   }
