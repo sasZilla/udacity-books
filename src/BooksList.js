@@ -20,7 +20,7 @@ class BooksList extends React.Component {
       });
   }
 
-  onChangeShelf(book) {
+  onChangeShelf = book => {
     this.setState(state => ({
       books: state.books.map(function(b) {
         if (b.id === book.id) {
@@ -29,7 +29,7 @@ class BooksList extends React.Component {
         return b;
       })
     }));
-  }
+  };
 
   render() {
     const books = this.state.books;
@@ -61,7 +61,7 @@ class BooksList extends React.Component {
                   key={shelf.title + '-' + i}
                   books={shelf.books}
                   title={shelf.title}
-                  onChangeShelf={this.onChangeShelf.bind(this)}
+                  onChangeShelf={this.onChangeShelf}
                 />
               )}
         </div>

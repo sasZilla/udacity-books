@@ -7,14 +7,14 @@ class BookItem extends React.Component {
     shelf: this.props.book.shelf
   };
 
-  onSelect(event) {
+  onSelect = event => {
     const shelf = event.target.value;
-    this.setState({ shelf: shelf });
-    this.props.book.shelf = shelf;
     BooksAPI.update(this.props.book, shelf).then(() => {
+      this.setState({ shelf: shelf });
+      this.props.book.shelf = shelf;
       this.props.onChangeShelf(this.props.book);
     });
-  }
+  };
 
   render() {
     const book = this.props.book;
@@ -31,10 +31,7 @@ class BookItem extends React.Component {
             }}
           />
           <div className="book-shelf-changer">
-            <select
-              onChange={this.onSelect.bind(this)}
-              value={this.state.shelf}
-            >
+            <select onChange={this.onSelect} value={this.state.shelf}>
               <option value="none" disabled>
                 Move to...
               </option>
