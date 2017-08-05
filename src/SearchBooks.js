@@ -16,6 +16,8 @@ class SearchBooks extends Component {
 
   constructor() {
     super();
+    // Throttling search results
+    // Waiting 1s before request backend
     this.searchBooks = debounce(this.searchBooks, 1000);
   }
 
@@ -41,7 +43,8 @@ class SearchBooks extends Component {
     });
   }
 
-  updateQuery(query) {
+  updateQuery(event) {
+    let query = event.target.value;
     this.setState({ query });
     if (query.length > 0) {
       this.searchBooks(query);
@@ -73,7 +76,7 @@ class SearchBooks extends Component {
               type="text"
               placeholder="Search by title or author"
               value={this.state.query}
-              onChange={event => this.updateQuery(event.target.value)}
+              onChange={this.updateQuery.bind(this)}
             />
           </div>
         </div>
